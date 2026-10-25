@@ -208,6 +208,7 @@ body.light-mode .modal-backdrop{background:#18223866}
 <script>
 (() => {
   const KEY = "nextMoneySettings_v1";
+  const SCHEDULE_KEY = "nextMoneySchedule_v1";
   const defaults = () => {
     const now = new Date();
     const month = addMonths(now, 1);
@@ -221,10 +222,25 @@ body.light-mode .modal-backdrop{background:#18223866}
     return `${date.getFullYear()}-${p(date.getMonth()+1)}-${p(date.getDate())}T${p(date.getHours())}:${p(date.getMinutes())}`;
   }
   function load() {
+    const base = defaults();
     try {
       const saved = localStorage.getItem(KEY);
-      return saved ? {...defaults(), ...JSON.parse(saved)} : defaults();
-    } catch { return defaults(); }
+      const parsed = saved ? JSON.parse(saved) : {};
+      const state = { ...base, ...(parsed && typeof parsed === "object" ? parsed : {}) };
+      // Store next allowance dates separately as a recovery copy.
+      try {
+        const scheduleRaw = localStorage.getItem(SCHEDULE_KEY);
+        if (scheduleRaw) {
+          const schedule = JSON.parse(scheduleRaw);
+          if (schedule && typeof schedule.monthlyNext === "string" && schedule.monthlyNext &&
+              typeof schedule.weeklyNext === "string" && schedule.weeklyNext) {
+            state.monthlyNext = schedule.monthlyNext;
+            state.weeklyNext = schedule.weeklyNext;
+          }
+        }
+      } catch {}
+      return state;
+    } catch { return base; }
   }
   let state = load();
   const $ = id => document.getElementById(id);
@@ -374,6 +390,11 @@ body.light-mode .modal-backdrop{background:#18223866}
   function saveState(showToast = true) {
     try {
       localStorage.setItem(KEY, JSON.stringify(state));
+      localStorage.setItem(SCHEDULE_KEY, JSON.stringify({
+        monthlyNext: state.monthlyNext,
+        weeklyNext: state.weeklyNext,
+        savedAt: new Date().toISOString()
+      }));
       $("saveStatus").textContent = "保存済み · " + new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
       if(showToast) {
         $("toast").classList.add("show");
@@ -417,6 +438,14 @@ body.light-mode .modal-backdrop{background:#18223866}
     state.theme = state.theme === "dark" ? "light" : "dark";
     render();
     saveState();
+  });
+  $("monthlyNextInput").addEventListener("change", () => {
+    const value = $("monthlyNextInput").value;
+    if (value) { state.monthlyNext = value; saveState(false); }
+  });
+  $("weeklyNextInput").addEventListener("change", () => {
+    const value = $("weeklyNextInput").value;
+    if (value) { state.weeklyNext = value; saveState(false); }
   });
   $("clockModeInput").addEventListener("change", () => {
     $("manualClockFields").style.display = $("clockModeInput").value === "manual" ? "block" : "none";
