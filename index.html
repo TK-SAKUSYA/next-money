@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111827">
+<title>NEXT MONEY</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#151d32;--panel2:#1c2741;--text:#f4f7ff;--muted:#aab6d1;--line:#2d3a58;--blue:#79a7ff;--green:#65e0b0;--gold:#ffd166;--shadow:0 18px 45px #0003}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#1c2a4a 0,#0b1020 55%);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:1100px;margin:0 auto;padding:28px 22px 48px}
+header{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:26px}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,#78a7ff,#7c6cff);font-size:25px;box-shadow:0 8px 24px #536dff44}
+h1{font-size:clamp(1.45rem,3vw,2rem);letter-spacing:.08em;margin:0;font-weight:850}
+.tagline{color:var(--muted);font-size:.88rem;margin-top:3px}
+.header-actions{display:flex;gap:9px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#202b45;color:var(--text);padding:10px 14px;border-radius:12px;font-weight:700}
+.btn:hover{filter:brightness(1.12)}
+.btn.primary{background:var(--blue);border-color:transparent;color:#10172b}
+.balance{background:linear-gradient(120deg,#1a2945,#19213a);border:1px solid #344363;border-radius:20px;padding:22px 25px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:20px;box-shadow:var(--shadow)}
+.current-clock{min-width:190px;padding-right:20px;border-right:1px solid var(--line)}
+.clock-date{font-size:.9rem;font-weight:700;margin-top:7px;color:#dce6ff}
+.clock-time{font-size:1.65rem;font-weight:850;letter-spacing:.04em;font-variant-numeric:tabular-nums;margin-top:2px}
+.balance-details{flex:1;min-width:0}
+.eyebrow{font-size:.78rem;color:var(--muted);letter-spacing:.08em;font-weight:750}
+.balance-amount{font-size:clamp(1.8rem,5vw,2.65rem);font-weight:850;letter-spacing:-.03em;margin-top:5px}
+.balance-note{color:var(--muted);font-size:.9rem;margin-top:3px}
+.coin{font-size:40px;flex-shrink:0}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card{position:relative;overflow:hidden;background:linear-gradient(155deg,#19243b,#121a2d);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:var(--shadow)}
+.card:before{content:"";position:absolute;width:140px;height:140px;right:-50px;top:-60px;border-radius:50%;background:var(--accent);opacity:.11;filter:blur(2px)}
+.card.monthly{--accent:var(--blue)}.card.weekly{--accent:var(--green)}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;position:relative}
+.kind{font-size:.8rem;color:var(--muted);font-weight:750}
+.card h2{font-size:1.18rem;margin:5px 0 0}
+.amount{font-size:clamp(1.65rem,4vw,2.15rem);font-weight:850;margin-top:18px;color:var(--accent)}
+.pill{background:#ffffff0c;border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-size:.78rem;white-space:nowrap}
+.count-label{margin-top:22px;color:var(--muted);font-size:.84rem;font-weight:700}
+.countdown{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.time-unit{background:#0c1324a8;border:1px solid #283653;border-radius:12px;padding:11px 7px;text-align:center;min-width:0}
+.time-unit strong{display:block;font-size:clamp(1.08rem,2.6vw,1.45rem);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.time-unit span{display:block;font-size:.72rem;color:var(--muted);margin-top:3px}
+.next-date{margin-top:12px;color:var(--muted);font-size:.82rem}
+.projection{margin-top:16px;border-top:1px solid var(--line);padding-top:15px}
+.projection-title{font-size:.8rem;color:var(--muted);font-weight:700}
+.projection-money{font-size:1.18rem;font-weight:800;margin-top:5px;color:var(--green)}
+.projection-note{font-size:.78rem;color:var(--muted);margin-top:4px;line-height:1.5}
+footer{margin-top:23px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:.78rem}
+.modal-backdrop{position:fixed;inset:0;background:#030712c9;display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
+.modal-backdrop.open{display:flex}
+.modal{width:min(560px,100%);max-height:90vh;overflow:auto;background:#131c30;border:1px solid #344363;border-radius:20px;padding:23px;box-shadow:0 30px 100px #0008}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.modal h2{margin:0;font-size:1.35rem}
+.close{font-size:1.3rem;padding:5px 10px}
+.field-group{border-top:1px solid var(--line);padding:16px 0}
+.field-group:first-of-type{border-top:0}
+.field-group h3{font-size:.95rem;margin:0 0 12px}
+.field{display:grid;grid-template-columns:1fr minmax(130px,190px);align-items:center;gap:12px;margin:11px 0}
+.field label{font-size:.88rem;color:#dce5fa}
+input,select{width:100%;min-width:0;background:#0b1222;color:var(--text);border:1px solid #354362;border-radius:10px;padding:10px 11px}
+input:focus,select:focus{outline:2px solid #79a7ff88;border-color:var(--blue)}
+.hint{font-size:.78rem;line-height:1.5;color:var(--muted);margin:9px 0 0}
+.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:12px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#e5fff5;color:#10271f;padding:11px 16px;border-radius:12px;font-weight:800;transition:.2s;z-index:8;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+body.mobile-mode .app{max-width:520px;padding:18px 14px 34px}
+body.mobile-mode header{align-items:flex-start}
+body.mobile-mode .cards{grid-template-columns:1fr}
+body.mobile-mode .balance{padding:18px;flex-wrap:wrap}
+body.mobile-mode .current-clock{width:100%;border-right:0;border-bottom:1px solid var(--line);padding:0 0 13px}
+body.mobile-mode .balance-details{flex:1}
+body.mobile-mode .card{padding:19px}
+body.mobile-mode .header-actions .btn{padding:9px 11px}
+@media(max-width:650px){.app{padding:18px 14px 34px}header{align-items:flex-start;flex-direction:column}.header-actions{width:100%}.cards{grid-template-columns:1fr}.balance{padding:18px;flex-wrap:wrap}.current-clock{width:100%;border-right:0;border-bottom:1px solid var(--line);padding:0 0 13px}.balance-details{flex:1}.card{padding:19px}}
+body.light-mode{color-scheme:light;--bg:#f4f7fc;--panel:#ffffff;--panel2:#eef3fb;--text:#182238;--muted:#596780;--line:#d5deec;--blue:#315fd6;--green:#087d58;--gold:#9b6900;--shadow:0 14px 34px #25385812;background:radial-gradient(ellipse at top,#ffffff 0,#edf2fa 62%);color:var(--text)}
+body.light-mode .balance{background:linear-gradient(120deg,#ffffff,#edf3ff);border-color:#d5deec}
+body.light-mode .clock-date{color:#425574}
+body.light-mode .card{background:linear-gradient(155deg,#ffffff,#f3f6fc);border-color:#d5deec}
+body.light-mode .pill{background:#edf2fb;border-color:#d5deec;color:#53617a}
+body.light-mode .time-unit{background:#edf2fb;border-color:#d5deec}
+body.light-mode .btn{background:#edf2fb;color:#182238;border-color:#d5deec}
+body.light-mode .btn.primary{background:#315fd6;color:#fff;border-color:transparent}
+body.light-mode .modal{background:#fff;border-color:#d5deec}
+body.light-mode .field label{color:#34425c}
+body.light-mode input,body.light-mode select{background:#f7f9fd;color:#182238;border-color:#cbd6e8}
+body.light-mode .current-clock{border-color:#d5deec}
+body.light-mode .projection{border-color:#d5deec}
+body.light-mode .modal-backdrop{background:#18223866}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden="true">💰</div>
+      <div><h1>NEXT MONEY</h1><div class="tagline">次のお小遣いまで、あとどれくらい？</div></div>
+    </div>
+    <div class="header-actions">
+      <button class="btn" id="modeBtn" type="button">📱 モバイルモードへ</button>
+      <button class="btn primary" id="settingsBtn" type="button">⚙️ 設定</button>
+    </div>
+  </header>
+
+  <section class="balance" aria-live="polite">
+    <div class="current-clock" aria-live="off">
+      <div class="eyebrow">CURRENT DATE & TIME · 現在日時</div>
+      <div class="clock-date" id="currentDate">----</div>
+      <div class="clock-time" id="currentTime">--:--:--</div>
+    </div>
+    <div class="balance-details">
+    <div>
+      <div class="eyebrow">CURRENT BALANCE · 現在の所持金</div>
+      <div class="balance-amount" id="currentBalance">¥0</div>
+      <div class="balance-note">設定からいつでも変更できます</div>
+    </div>
+    </div>
+    <div class="coin" aria-hidden="true">🪙</div>
+  </section>
+
+  <main class="cards">
+    <section class="card monthly">
+      <div class="card-top">
+        <div><div class="kind">MONTHLY · 毎月</div><h2>月のお小遣い</h2></div>
+        <span class="pill" id="monthlyPeriod">1か月ごと</span>
+      </div>
+      <div class="amount" id="monthlyAmount">¥3,000</div>
+      <div class="count-label">次のお小遣いまで</div>
+      <div class="countdown" id="monthlyCountdown"></div>
+      <div class="next-date" id="monthlyDate"></div>
+      <div class="projection">
+        <div class="projection-title">🧺 1円も使わなかったら（次回受取後）</div>
+        <div class="projection-money" id="monthlyProjection">¥3,000</div>
+        <div class="projection-note" id="monthlyProjectionNote"></div>
+      </div>
+    </section>
+
+    <section class="card weekly">
+      <div class="card-top">
+        <div><div class="kind">WEEKLY · 毎週</div><h2>週のお小遣い</h2></div>
+        <span class="pill" id="weeklyPeriod">1週間ごと</span>
+      </div>
+      <div class="amount" id="weeklyAmount">¥500</div>
+      <div class="count-label">次のお小遣いまで</div>
+      <div class="countdown" id="weeklyCountdown"></div>
+      <div class="next-date" id="weeklyDate"></div>
+      <div class="projection">
+        <div class="projection-title">🧺 1円も使わなかったら（次回受取後）</div>
+        <div class="projection-money" id="weeklyProjection">¥500</div>
+        <div class="projection-note" id="weeklyProjectionNote"></div>
+      </div>
+    </section>
+  </main>
+  <footer><span>💾 設定はこのブラウザに保存されます</span><span id="saveStatus">まだ変更はありません</span></footer>
+</div>
+
+<div class="modal-backdrop" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+  <div class="modal">
+    <div class="modal-head"><h2 id="settingsTitle">⚙️ 設定</h2><button class="btn close" id="closeSettings" aria-label="閉じる" type="button">×</button></div>
+    <div class="field-group theme-setting">
+      <h3>① ライト／ダークモード</h3>
+      <div class="field"><label for="themeToggleBtn">画面の明るさ</label><button class="btn" id="themeToggleBtn" type="button">☀️ ライトモード</button></div>
+      <p class="hint">ボタンを押すとすぐに切り替わり、自動で保存されます。</p>
+    </div>
+    <div class="field-group">
+      <h3>② お小遣い期間変更</h3>
+      <div class="field"><label for="monthlyPeriodInput">月のお小遣いの周期</label><select id="monthlyPeriodInput"><option value="1">1か月ごと</option><option value="2">2か月ごと</option><option value="3">3か月ごと</option><option value="6">6か月ごと</option><option value="12">12か月ごと</option></select></div>
+      <div class="field"><label for="monthlyNextInput">月のお小遣いの次回日時</label><input id="monthlyNextInput" type="datetime-local"></div>
+      <div class="field"><label for="weeklyPeriodInput">週のお小遣いの周期</label><select id="weeklyPeriodInput"><option value="1">1週間ごと</option><option value="2">2週間ごと</option><option value="3">3週間ごと</option><option value="4">4週間ごと</option></select></div>
+      <div class="field"><label for="weeklyNextInput">週のお小遣いの次回日時</label><input id="weeklyNextInput" type="datetime-local"></div>
+      <p class="hint">次回日時を設定すると、その日時から指定した周期で次のお小遣いを計算します。</p>
+    </div>
+    <div class="field-group">
+      <h3>③ 現在日時の設定（ズレる場合の手動補正）</h3>
+      <div class="field"><label for="clockModeInput">日時の取得方法</label><select id="clockModeInput"><option value="auto">端末から自動取得</option><option value="manual">手動で日時を入力</option></select></div>
+      <div id="manualClockFields">
+        <div class="field"><label for="clockYearInput">年</label><input id="clockYearInput" type="number" min="1970" max="9999" step="1"></div>
+        <div class="field"><label for="clockMonthInput">月</label><input id="clockMonthInput" type="number" min="1" max="12" step="1"></div>
+        <div class="field"><label for="clockDayInput">日</label><input id="clockDayInput" type="number" min="1" max="31" step="1"></div>
+        <div class="field"><label for="clockWeekdayInput">曜日</label><select id="clockWeekdayInput"><option value="0">日曜日</option><option value="1">月曜日</option><option value="2">火曜日</option><option value="3">水曜日</option><option value="4">木曜日</option><option value="5">金曜日</option><option value="6">土曜日</option></select></div>
+        <div class="field"><label for="clockHourInput">時（24時間制）</label><input id="clockHourInput" type="number" min="0" max="23" step="1"></div>
+        <div class="field"><label for="clockMinuteInput">分</label><input id="clockMinuteInput" type="number" min="0" max="59" step="1"></div>
+        <div class="field"><label for="clockSecondInput">秒</label><input id="clockSecondInput" type="number" min="0" max="59" step="1"></div>
+        <p class="hint">手動モードでは、入力した日時を基準に秒数が進みます。曜日は年月日と一致している必要があります。</p>
+      </div>
+    </div>
+    <div class="field-group">
+      <h3>④ お小遣い額変更</h3>
+      <div class="field"><label for="monthlyAmountInput">月のお小遣い（円）</label><input id="monthlyAmountInput" type="number" min="0" step="1" inputmode="numeric"></div>
+      <div class="field"><label for="weeklyAmountInput">週のお小遣い（円）</label><input id="weeklyAmountInput" type="number" min="0" step="1" inputmode="numeric"></div>
+    </div>
+    <div class="field-group">
+      <h3>⑤ 所持金入力</h3>
+      <div class="field"><label for="balanceInput">現在の所持金（円）</label><input id="balanceInput" type="number" min="0" step="1" inputmode="numeric"></div>
+    </div>
+    <div class="field-group">
+      <h3>表示モード</h3>
+      <div class="field"><label for="modeInput">レイアウト</label><select id="modeInput"><option value="pc">PCモード</option><option value="mobile">モバイルモード</option></select></div>
+    </div>
+    <div class="modal-actions"><button class="btn" id="cancelSettings" type="button">キャンセル</button><button class="btn primary" id="saveSettings" type="button">💾 保存する</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status">保存しました！ 💾</div>
+<script>
+(() => {
+  const KEY = "nextMoneySettings_v1";
+  const defaults = () => {
+    const now = new Date();
+    const month = addMonths(now, 1);
+    const week = new Date(now); week.setDate(week.getDate() + 7);
+    return { monthlyPeriod: 1, weeklyPeriod: 1, monthlyAmount: 3000, weeklyAmount: 500, balance: 0,
+      monthlyNext: toLocalInput(month), weeklyNext: toLocalInput(week), mode: "pc", theme: "dark",
+      clockMode: "auto", manualClock: toLocalInput(now) + ":" + String(now.getSeconds()).padStart(2,"0"), manualSetAt: Date.now() };
+  };
+  function toLocalInput(date) {
+    const p = n => String(n).padStart(2, "0");
+    return `${date.getFullYear()}-${p(date.getMonth()+1)}-${p(date.getDate())}T${p(date.getHours())}:${p(date.getMinutes())}`;
+  }
+  function load() {
+    try {
+      const saved = localStorage.getItem(KEY);
+      return saved ? {...defaults(), ...JSON.parse(saved)} : defaults();
+    } catch { return defaults(); }
+  }
+  let state = load();
+  const $ = id => document.getElementById(id);
+  const yen = n => { const value = Number(n); const safeValue = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0; return "¥" + safeValue.toLocaleString("ja-JP"); };
+  // datetime-local is a local wall-clock time. Parse its components explicitly so
+  // browser parsing differences cannot shift the selected date/time.
+  const validDate = value => {
+    if (typeof value === "string") {
+      const m = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/);
+      if (m) {
+        const d = new Date(Number(m[1]), Number(m[2])-1, Number(m[3]), Number(m[4]), Number(m[5]), Number(m[6] || 0), 0);
+        if (d.getFullYear() === Number(m[1]) && d.getMonth() === Number(m[2])-1 && d.getDate() === Number(m[3])) return d;
+      }
+    }
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? new Date(Date.now() + 86400000) : d;
+  };
+  function getNextDate(dateValue, period, isMonthly, now = new Date()) {
+    // Always calculate from the original scheduled date. This prevents a Jan 31
+    // schedule from drifting to the 28th/30th after shorter months.
+    const anchor = validDate(dateValue);
+    const step = Math.max(1, Number(period) || 1);
+    if (anchor > now) return anchor;
+    if (isMonthly) {
+      let months = Math.max(0, (now.getFullYear()-anchor.getFullYear())*12 + now.getMonth()-anchor.getMonth());
+      let occurrence = addMonths(anchor, Math.floor(months / step) * step);
+      while (occurrence <= now) {
+        months = Math.floor(months / step) * step + step;
+        occurrence = addMonths(anchor, months);
+      }
+      while (months >= step) {
+        const previous = addMonths(anchor, months-step);
+        if (previous <= now) break;
+        months -= step;
+        occurrence = previous;
+      }
+      return occurrence;
+    }
+    const interval = step * 7;
+    const elapsedDays = Math.floor((new Date(now.getFullYear(),now.getMonth(),now.getDate()) - new Date(anchor.getFullYear(),anchor.getMonth(),anchor.getDate())) / 86400000);
+    let weeks = Math.max(0, Math.floor(elapsedDays / interval));
+    let occurrence = addDays(anchor, weeks * interval);
+    while (occurrence <= now) { weeks += 1; occurrence = addDays(anchor, weeks * interval); }
+    return occurrence;
+  }
+  function addDays(date, count) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + count);
+    return result;
+  }
+  function addMonths(date, count) {
+    const day = date.getDate();
+    const result = new Date(date);
+    result.setDate(1);
+    result.setMonth(result.getMonth() + count);
+    const last = new Date(result.getFullYear(), result.getMonth()+1, 0).getDate();
+    result.setDate(Math.min(day, last));
+    return result;
+  }
+  function diffParts(target, now) {
+    if (target <= now) return [0,0,0,0,0,0];
+    let cursor = new Date(now);
+    let years = target.getFullYear() - cursor.getFullYear();
+    let candidate = addYearsClamped(cursor, years);
+    while (candidate > target) { years--; candidate = addYearsClamped(cursor, years); }
+    cursor = candidate;
+    let months = (target.getFullYear()-cursor.getFullYear())*12 + target.getMonth()-cursor.getMonth();
+    candidate = addMonths(cursor, months);
+    while (candidate > target) { months--; candidate = addMonths(cursor, months); }
+    cursor = candidate;
+    let remaining = target.getTime() - cursor.getTime();
+    const days = Math.floor(remaining / 86400000); remaining -= days * 86400000;
+    const hours = Math.floor(remaining / 3600000); remaining -= hours * 3600000;
+    const minutes = Math.floor(remaining / 60000); remaining -= minutes * 60000;
+    const seconds = Math.floor(remaining / 1000);
+    return [years, months, days, hours, minutes, seconds];
+  }
+  function addYearsClamped(date, count) {
+    const result = new Date(date);
+    const month = result.getMonth(), day = result.getDate();
+    result.setDate(1);
+    result.setFullYear(result.getFullYear() + count);
+    result.setMonth(month);
+    result.setDate(Math.min(day, new Date(result.getFullYear(), month+1, 0).getDate()));
+    return result;
+  }
+  function countdownHTML(parts) {
+    const labels = ["年","月","日","時","分","秒"];
+    return parts.map((v,i) => `<div class="time-unit"><strong>${String(v).padStart(2,"0")}</strong><span>${labels[i]}</span></div>`).join("");
+  }
+  function dateLabel(date) {
+    return new Intl.DateTimeFormat("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short",hour:"2-digit",minute:"2-digit"}).format(date);
+  }
+  function projection(amount, nextDate, periodMs, currentBalance, isMonthly) {
+    const balanceAfterNext = Number(currentBalance) + Number(amount);
+    const oneYear = new Date(); oneYear.setFullYear(oneYear.getFullYear()+1);
+    let count = 0, cursor = new Date(nextDate), guard = 0;
+    while (cursor <= oneYear && guard++ < 1000) {
+      count++;
+      cursor = isMonthly ? addMonths(cursor, Number(state.monthlyPeriod)) : addDays(cursor, Number(state.weeklyPeriod)*7);
+    }
+    const total = Number(currentBalance) + count * Number(amount);
+    return {balanceAfterNext, count, total};
+  }
+  function renderOne(prefix, isMonthly, now) {
+    const period = isMonthly ? Number(state.monthlyPeriod) : Number(state.weeklyPeriod);
+    const amount = isMonthly ? Number(state.monthlyAmount) : Number(state.weeklyAmount);
+    const dateValue = isMonthly ? state.monthlyNext : state.weeklyNext;
+    const next = getNextDate(dateValue, period, isMonthly, now);
+    $(prefix+"Amount").textContent = yen(amount);
+    $(prefix+"Period").textContent = isMonthly ? `${period}か月ごと` : `${period}週間ごと`;
+    $(prefix+"Countdown").innerHTML = countdownHTML(diffParts(next, now));
+    $(prefix+"Date").textContent = "予定日時： " + dateLabel(next);
+    const p = projection(amount, next, 0, state.balance, isMonthly);
+    $(prefix+"Projection").textContent = yen(p.balanceAfterNext);
+    $(prefix+"ProjectionNote").textContent = `今の所持金 ${yen(state.balance)} ＋ 次回 ${yen(amount)}。今後1年間で受け取る回数の目安：${p.count}回（合計 ${yen(p.total)}）。`;
+  }
+  function getReferenceNow() {
+    if (state.clockMode !== "manual") return new Date();
+    const base = validDateWithSeconds(state.manualClock);
+    const setAt = Number(state.manualSetAt) || Date.now();
+    return new Date(base.getTime() + Math.max(0, Date.now() - setAt));
+  }
+  function validDateWithSeconds(value) {
+    const m = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})$/);
+    if (!m) return new Date();
+    const d = new Date(+m[1], +m[2]-1, +m[3], +m[4], +m[5], +m[6], 0);
+    if (d.getFullYear() !== +m[1] || d.getMonth() !== +m[2]-1 || d.getDate() !== +m[3] || d.getHours() !== +m[4] || d.getMinutes() !== +m[5] || d.getSeconds() !== +m[6]) return new Date();
+    return d;
+  }
+  function render() {
+    const now = getReferenceNow();
+    document.body.classList.toggle("mobile-mode", state.mode === "mobile");
+    document.body.classList.toggle("light-mode", state.theme === "light");
+    const themeButton = $("themeToggleBtn");
+    if (themeButton) themeButton.textContent = state.theme === "dark" ? "☀️ ライトモード" : "🌙 ダークモード";
+    $("currentDate").textContent = new Intl.DateTimeFormat("ja-JP", {year:"numeric", month:"2-digit", day:"2-digit", weekday:"short"}).format(now);
+    $("currentTime").textContent = new Intl.DateTimeFormat("ja-JP", {hour:"2-digit", minute:"2-digit", second:"2-digit", hourCycle:"h23"}).format(now);
+    $("modeBtn").textContent = state.mode === "pc" ? "📱 モバイルモードへ" : "🖥️ PCモードへ";
+    $("modeInput").value = state.mode;
+    $("clockModeInput").value = state.clockMode || "auto";
+    $("manualClockFields").style.display = state.clockMode === "manual" ? "block" : "none";
+    $("currentBalance").textContent = yen(state.balance);
+    renderOne("monthly", true, now);
+    renderOne("weekly", false, now);
+  }
+  function saveState(showToast = true) {
+    try {
+      localStorage.setItem(KEY, JSON.stringify(state));
+      $("saveStatus").textContent = "保存済み · " + new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
+      if(showToast) {
+        $("toast").classList.add("show");
+        setTimeout(() => $("toast").classList.remove("show"), 1800);
+      }
+    } catch {
+      $("saveStatus").textContent = "保存できませんでした（ブラウザの保存設定を確認）";
+    }
+  }
+  function openSettings() {
+    $("monthlyPeriodInput").value = String(state.monthlyPeriod);
+    $("weeklyPeriodInput").value = String(state.weeklyPeriod);
+    $("monthlyNextInput").value = state.monthlyNext;
+    $("weeklyNextInput").value = state.weeklyNext;
+    $("monthlyAmountInput").value = state.monthlyAmount;
+    $("weeklyAmountInput").value = state.weeklyAmount;
+    $("balanceInput").value = state.balance;
+    $("modeInput").value = state.mode;
+    $("clockModeInput").value = state.clockMode || "auto";
+    const clock = getReferenceNow();
+    $("clockYearInput").value = clock.getFullYear();
+    $("clockMonthInput").value = clock.getMonth()+1;
+    $("clockDayInput").value = clock.getDate();
+    $("clockWeekdayInput").value = clock.getDay();
+    $("clockHourInput").value = clock.getHours();
+    $("clockMinuteInput").value = clock.getMinutes();
+    $("clockSecondInput").value = clock.getSeconds();
+    $("manualClockFields").style.display = $("clockModeInput").value === "manual" ? "block" : "none";
+    $("settingsModal").classList.add("open");
+  }
+  function closeSettings() { $("settingsModal").classList.remove("open"); }
+  $("settingsBtn").addEventListener("click", openSettings);
+  $("closeSettings").addEventListener("click", closeSettings);
+  $("cancelSettings").addEventListener("click", closeSettings);
+  $("settingsModal").addEventListener("click", e => { if(e.target === $("settingsModal")) closeSettings(); });
+  $("modeBtn").addEventListener("click", () => {
+    state.mode = state.mode === "pc" ? "mobile" : "pc";
+    render(); saveState();
+  });
+  $("themeToggleBtn").addEventListener("click", () => {
+    state.theme = state.theme === "dark" ? "light" : "dark";
+    render();
+    saveState();
+  });
+  $("clockModeInput").addEventListener("change", () => {
+    $("manualClockFields").style.display = $("clockModeInput").value === "manual" ? "block" : "none";
+  });
+  $("clockYearInput").addEventListener("input", updateWeekdayFromDate);
+  $("clockMonthInput").addEventListener("input", updateWeekdayFromDate);
+  $("clockDayInput").addEventListener("input", updateWeekdayFromDate);
+  function updateWeekdayFromDate() {
+    const y = Number($("clockYearInput").value), m = Number($("clockMonthInput").value), d = Number($("clockDayInput").value);
+    if (y >= 1970 && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+      const date = new Date(y,m-1,d);
+      if (date.getFullYear() === y && date.getMonth() === m-1 && date.getDate() === d) $("clockWeekdayInput").value = date.getDay();
+    }
+  }
+  $("saveSettings").addEventListener("click", () => {
+    const mNext = $("monthlyNextInput").value;
+    const wNext = $("weeklyNextInput").value;
+    const mAmount = Number($("monthlyAmountInput").value);
+    const wAmount = Number($("weeklyAmountInput").value);
+    const balance = Number($("balanceInput").value);
+    const clockMode = $("clockModeInput").value;
+    const clockParts = ["clockYearInput","clockMonthInput","clockDayInput","clockHourInput","clockMinuteInput","clockSecondInput"].map(id => Number($(id).value));
+    const [cy,cm,cd,ch,cmin,cs] = clockParts;
+    const manualDate = new Date(cy,cm-1,cd,ch,cmin,cs,0);
+    const clockPartsValid = cy >= 1970 && cy <= 9999 && cm >= 1 && cm <= 12 && cd >= 1 && ch >= 0 && ch <= 23 && cmin >= 0 && cmin <= 59 && cs >= 0 && cs <= 59 && manualDate.getFullYear() === cy && manualDate.getMonth() === cm-1 && manualDate.getDate() === cd && manualDate.getHours() === ch && manualDate.getMinutes() === cmin && manualDate.getSeconds() === cs;
+    if (clockMode === "manual" && (!clockPartsValid || manualDate.getDay() !== Number($("clockWeekdayInput").value))) {
+      alert("現在日時が正しくありません。年月日・曜日・時分秒を確認してください。");
+      return;
+    }
+    if (!mNext || !wNext || !Number.isFinite(mAmount) || mAmount < 0 || !Number.isFinite(wAmount) || wAmount < 0 || !Number.isFinite(balance) || balance < 0) {
+      alert("日時を入力し、金額は0以上の数字で入力してください。");
+      return;
+    }
+    state.monthlyPeriod = Number($("monthlyPeriodInput").value);
+    state.weeklyPeriod = Number($("weeklyPeriodInput").value);
+    state.monthlyNext = mNext;
+    state.weeklyNext = wNext;
+    state.monthlyAmount = Math.floor(mAmount);
+    state.weeklyAmount = Math.floor(wAmount);
+    state.balance = Math.floor(balance);
+    state.mode = $("modeInput").value;
+    state.clockMode = clockMode;
+    if (clockMode === "manual") {
+      state.manualClock = `${String(cy).padStart(4,"0")}-${String(cm).padStart(2,"0")}-${String(cd).padStart(2,"0")}T${String(ch).padStart(2,"0")}:${String(cmin).padStart(2,"0")}:${String(cs).padStart(2,"0")}`;
+      state.manualSetAt = Date.now();
+    }
+    closeSettings(); render(); saveState();
+  });
+  render();
+  saveState(false);
+  setInterval(render, 1000);
+})();
+</script>
+</body>
+</html>
