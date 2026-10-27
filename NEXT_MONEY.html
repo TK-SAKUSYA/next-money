@@ -91,6 +91,10 @@ body.light-mode .current-clock{border-color:#d5deec}
 body.light-mode .projection{border-color:#d5deec}
 body.light-mode .modal-backdrop{background:#18223866}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  .project-qr{margin-top:16px;padding:16px;border:1px solid var(--border);border-radius:14px;text-align:center;background:var(--surface-2,rgba(127,127,127,.06));}
+  .project-qr-title{margin:0 0 12px;font-weight:700;}
+  .project-qr img{display:block;width:180px;height:180px;max-width:100%;margin:0 auto 12px;padding:8px;background:#fff;border-radius:10px;box-sizing:border-box;}
+  .project-qr a{display:block;overflow-wrap:anywhere;font-size:.92rem;}
 </style>
 </head>
 <body>
@@ -200,6 +204,11 @@ body.light-mode .modal-backdrop{background:#18223866}
     <div class="field-group">
       <h3>表示モード</h3>
       <div class="field"><label for="modeInput">レイアウト</label><select id="modeInput"><option value="pc">PCモード</option><option value="mobile">モバイルモード</option></select></div>
+      <div class="project-qr">
+        <p class="project-qr-title">📱 この作品をスマホで開く</p>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;data=https%3A%2F%2Ftk-sakusya.github.io%2Fnext-money%2F" alt="NEXT MONEYを開くQRコード" width="180" height="180" loading="lazy">
+        <a href="https://tk-sakusya.github.io/next-money/" target="_blank" rel="noopener noreferrer">🔗 https://tk-sakusya.github.io/next-money/</a>
+      </div>
     </div>
     <div class="modal-actions"><button class="btn" id="cancelSettings" type="button">キャンセル</button><button class="btn primary" id="saveSettings" type="button">💾 保存する</button></div>
   </div>
